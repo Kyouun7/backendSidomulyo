@@ -51,27 +51,70 @@ app.use(['/api/berita', '/api/surat', '/api/pengaduan', '/api/statistik', '/api/
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// CORS configuration - lebih permisif untuk development
+// CORS configuration - lebih permisif untuk development dan production
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:4173',
   'http://127.0.0.1:4173',
-  'https://web-sidomulyo-a9tz.vercel.app'
-  // Tambahkan port frontend Anda di sini jika berbeda
+  'https://web-sidomulyo-a9tz.vercel.app',
+  'https://web-sidomulyo.vercel.app',
+  'https://websidomulyo.vercel.app',
+  'https://*.vercel.app', // Allow all Vercel subdomains
+  'https://*.railway.app' // Allow all Railway subdomains
 ];
+
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('CORS not allowed for this origin'), false);
+    
+    // Allow all localhost origins
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Allow specific origins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow Vercel domains (including subdomains)
+    if (origin.includes('vercel.app')) {
+      console.log('✅ Allowing Vercel domain:', origin);
+      return callback(null, true);
+    }
+    
+    // Allow Railway domains
+    if (origin.includes('railway.app')) {
+      console.log('✅ Allowing Railway domain:', origin);
+      return callback(null, true);
+    }
+    
+    // For production, be more restrictive but still allow Vercel
+    if (process.env.NODE_ENV === 'production') {
+      console.log('❌ CORS blocked origin:', origin);
+      return callback(new Error('CORS not allowed for this origin'), false);
+    }
+    
+    // For development, allow all
+    console.log('✅ Allowing origin in development:', origin);
+    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
+
+// Handle OPTIONS requests specifically
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
 
 // Body parsing middleware - tingkatkan limit untuk handle base64 images
 app.use(express.json({ limit: '50mb' }));
