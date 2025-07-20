@@ -1,0 +1,62 @@
+{
+  "selayangPandang": {
+    "id": 1,
+    "judul": "Selayang Pandang",
+    "konten": "Desa Sidomulyo adalah desa yang terletak di Kecamatan X, Kabupaten Y, Provinsi Z. Desa ini memiliki luas wilayah sekitar X hektar dengan jumlah penduduk sekitar X jiwa. Desa Sidomulyo dikenal dengan potensi pertaniannya yang subur dan masyarakatnya yang ramah serta gotong royong.",
+    "gambar": null,
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "visiMisi": {
+    "id": 2,
+    "judul": "Visi & Misi",
+    "visi": "ddanwdkakjdkawdkjnwaknjdkajwdknjawkdnwknadkwa",
+    "misi": [
+      "dawdawodmdwadwoadwajdlwadkjnndnjkawndknwadbkawbdkwabdbawbdkawbdbakwbdkjawbdawkbdkawdawad"
+    ],
+    "updatedAt": "2025-07-19T18:51:54.747Z"
+  },
+  "sejarah": {
+    "id": 3,
+    "judul": "Sejarah Desa",
+    "konten": "dajkwdjakdwkad",
+    "gambar": null,
+    "updatedAt": "2025-07-19T18:48:58.248Z"
+  },
+  "geografis": {
+    "id": 4,
+    "judul": "Kondisi Geografis",
+    "konten": "Desa Sidomulyo memiliki topografi yang bervariasi dari dataran rendah hingga perbukitan. Wilayah ini dialiri oleh beberapa sungai dan memiliki tanah yang subur untuk pertanian. Iklim di desa ini termasuk tropis dengan curah hujan yang cukup sepanjang tahun, sehingga sangat mendukung untuk kegiatan pertanian.",
+    "batasUtara": "Desa Kemantren",
+    "batasSelatan": "Desa Sidorejo",
+    "batasBarat": "Desa Karanganyar",
+    "batasTimur": "Desa Wonosari",
+    "luasWilayah": "X hektar",
+    "jumlahPenduduk": "X jiwa",
+    "gambar": null,
+    "updatedAt": "2025-07-19T18:35:55.244Z"
+  },
+  "demografis": {
+    "id": 5,
+    "judul": "Kondisi Demografis",
+    "konten": "Masyarakat Desa Sidomulyo terdiri dari berbagai suku dan agama yang hidup rukun berdampingan. Mayoritas penduduk bekerja sebagai petani dan pedagang. Tingkat pendidikan masyarakat terus meningkat seiring dengan pembangunan yang berkelanjutan di desa ini.",
+    "jumlahKK": "X KK",
+    "jumlahLakiLaki": "X jiwa",
+    "jumlahPerempuan": "X jiwa",
+    "agama": {
+      "Islam": "X%",
+      "Kristen": "X%",
+      "Katolik": "X%",
+      "Hindu": "X%",
+      "Buddha": "X%"
+    },
+    "pendidikan": {
+      "Tidak Sekolah": "X%",
+      "SD": "X%",
+      "SMP": "X%",
+      "SMA": "X%",
+      "D3/S1": "X%",
+      "S2/S3": "X%"
+    },
+    "updatedAt": "2025-07-19T18:01:56.248Z"
+  }
+}

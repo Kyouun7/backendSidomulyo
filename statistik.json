@@ -1,0 +1,163 @@
+[
+  {
+    "id": 1,
+    "kategori": "utama",
+    "label": "Total Penduduk",
+    "value": "23512",
+    "color": "#00aaff"
+  },
+  {
+    "id": 2,
+    "kategori": "utama",
+    "label": "Jumlah Keluarga",
+    "value": "6711",
+    "color": "#ff55aa"
+  },
+  {
+    "id": 3,
+    "kategori": "utama",
+    "label": "Surat Diproses Bulan Ini",
+    "value": 48,
+    "color": "#ffaa00"
+  },
+  {
+    "id": 4,
+    "kategori": "utama",
+    "label": "Program Aktif",
+    "value": 3,
+    "color": "#55ff55"
+  },
+  {
+    "id": 5,
+    "kategori": "usia",
+    "label": "0-5 th",
+    "value": 51,
+    "color": "#b3e0ff"
+  },
+  {
+    "id": 6,
+    "kategori": "usia",
+    "label": "6-17 th",
+    "value": 150,
+    "color": "#80c1ff"
+  },
+  {
+    "id": 7,
+    "kategori": "usia",
+    "label": "18-59 th",
+    "value": 180,
+    "color": "#3399ff"
+  },
+  {
+    "id": 8,
+    "kategori": "usia",
+    "label": "60+ th",
+    "value": 150,
+    "color": "#005c99"
+  },
+  {
+    "id": 9,
+    "kategori": "pendidikan",
+    "label": "Tidak Sekolah",
+    "value": 120,
+    "color": "#e0e0e0"
+  },
+  {
+    "id": 10,
+    "kategori": "pendidikan",
+    "label": "SD",
+    "value": 150,
+    "color": "#ffe066"
+  },
+  {
+    "id": 11,
+    "kategori": "pendidikan",
+    "label": "SMP",
+    "value": 150,
+    "color": "#8fd19e"
+  },
+  {
+    "id": 12,
+    "kategori": "pendidikan",
+    "label": "SMA",
+    "value": 150,
+    "color": "#6ec1e4"
+  },
+  {
+    "id": 13,
+    "kategori": "pendidikan",
+    "label": "Diploma/S1+",
+    "value": 180,
+    "color": "#b39ddb"
+  },
+  {
+    "id": 14,
+    "kategori": "pekerjaan",
+    "label": "Petani",
+    "value": 800,
+    "color": "#81c784"
+  },
+  {
+    "id": 15,
+    "kategori": "pekerjaan",
+    "label": "Buruh",
+    "value": 180,
+    "color": "#fff176"
+  },
+  {
+    "id": 16,
+    "kategori": "pekerjaan",
+    "label": "PNS",
+    "value": 120,
+    "color": "#64b5f6"
+  },
+  {
+    "id": 17,
+    "kategori": "pekerjaan",
+    "label": "Wiraswasta",
+    "value": 350,
+    "color": "#f06292"
+  },
+  {
+    "id": 18,
+    "kategori": "pekerjaan",
+    "label": "Pelajar/Mahasiswa",
+    "value": 480,
+    "color": "#9575cd"
+  },
+  {
+    "id": 19,
+    "kategori": "pekerjaan",
+    "label": "Lainnya",
+    "value": 200,
+    "color": "#bdbdbd"
+  },
+  {
+    "id": 20,
+    "kategori": "dusun",
+    "label": "Dusun Bareng",
+    "value": 180,
+    "color": "#42a5f5"
+  },
+  {
+    "id": 21,
+    "kategori": "dusun",
+    "label": "Dusun Tebelo",
+    "value": 800,
+    "color": "#66bb6a"
+  },
+  {
+    "id": 22,
+    "kategori": "dusun",
+    "label": "Dusun Mangunrejo",
+    "value": 650,
+    "color": "#ffee58"
+  },
+  {
+    "id": 23,
+    "kategori": "dusun",
+    "label": "Dusun Sumberkrecek",
+    "value": 500,
+    "color": "#ab47bc"
+  }
+]
