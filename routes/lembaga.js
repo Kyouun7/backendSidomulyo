@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { promisePool } = require('../config');
 const { auth, adminAuth } = require('../middleware/auth');
-const { uploadImage } = require('../middleware/upload');
+const { uploadImage, uploadFlexible } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -16,10 +16,17 @@ router.get('/', async (req, res) => {
     // Get pengurus for each lembaga
     for (let i = 0; i < lembaga.length; i++) {
       const [pengurus] = await promisePool.query(
-        'SELECT * FROM pengurus_lembaga WHERE lembaga_id = ? ORDER BY jabatan',
+        'SELECT * FROM pengurus_lembaga WHERE lembaga_id = ? ORDER BY id',
         [lembaga[i].id]
       );
       lembaga[i].pengurus = pengurus;
+
+      // Get unit kegiatan for each lembaga
+      const [unitKegiatan] = await promisePool.query(
+        'SELECT * FROM unit_kegiatan_lembaga WHERE lembaga_id = ? ORDER BY id',
+        [lembaga[i].id]
+      );
+      lembaga[i].unit_kegiatan = unitKegiatan;
     }
 
     res.json({ lembaga });
@@ -44,12 +51,17 @@ router.get('/:id', async (req, res) => {
     }
 
     const [pengurus] = await promisePool.query(
-      'SELECT * FROM pengurus_lembaga WHERE lembaga_id = ? ORDER BY jabatan',
+      'SELECT * FROM pengurus_lembaga WHERE lembaga_id = ? ORDER BY id',
+      [id]
+    );
+
+    const [unitKegiatan] = await promisePool.query(
+      'SELECT * FROM unit_kegiatan_lembaga WHERE lembaga_id = ? ORDER BY id',
       [id]
     );
 
     res.json({ 
-      lembaga: { ...lembaga[0], pengurus } 
+      lembaga: { ...lembaga[0], pengurus, unit_kegiatan } 
     });
   } catch (error) {
     console.error('Get lembaga by ID error:', error);
@@ -60,7 +72,10 @@ router.get('/:id', async (req, res) => {
 // Create lembaga (admin only)
 router.post('/', adminAuth, [
   body('nama_lembaga').notEmpty().withMessage('Nama lembaga wajib diisi'),
-  body('deskripsi').optional().notEmpty().withMessage('Deskripsi tidak boleh kosong jika diisi')
+  body('deskripsi').optional().notEmpty().withMessage('Deskripsi tidak boleh kosong jika diisi'),
+  body('tentang').optional(),
+  body('visi').optional(),
+  body('misi').optional()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -68,7 +83,7 @@ router.post('/', adminAuth, [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { nama_lembaga, deskripsi } = req.body;
+    const { nama_lembaga, deskripsi, tentang, visi, misi } = req.body;
 
     // Check if lembaga already exists
     const [existingLembaga] = await promisePool.query(
@@ -81,8 +96,8 @@ router.post('/', adminAuth, [
     }
 
     const [result] = await promisePool.query(
-      'INSERT INTO lembaga_desa (nama_lembaga, deskripsi) VALUES (?, ?)',
-      [nama_lembaga, deskripsi]
+      'INSERT INTO lembaga_desa (nama_lembaga, deskripsi, tentang, visi, misi) VALUES (?, ?, ?, ?, ?)',
+      [nama_lembaga, deskripsi, tentang, visi, misi]
     );
 
     const [newLembaga] = await promisePool.query(
@@ -102,8 +117,10 @@ router.post('/', adminAuth, [
 
 // Update lembaga (admin only)
 router.put('/:id', adminAuth, [
-  body('nama_lembaga').notEmpty().withMessage('Nama lembaga wajib diisi'),
-  body('deskripsi').optional().notEmpty().withMessage('Deskripsi tidak boleh kosong jika diisi')
+  body('deskripsi').optional().notEmpty().withMessage('Deskripsi tidak boleh kosong jika diisi'),
+  body('tentang').optional(),
+  body('visi').optional(),
+  body('misi').optional()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -112,7 +129,7 @@ router.put('/:id', adminAuth, [
     }
 
     const { id } = req.params;
-    const { nama_lembaga, deskripsi } = req.body;
+    const { deskripsi, tentang, visi, misi } = req.body;
 
     // Check if lembaga exists
     const [existingLembaga] = await promisePool.query(
@@ -124,19 +141,10 @@ router.put('/:id', adminAuth, [
       return res.status(404).json({ error: 'Lembaga tidak ditemukan' });
     }
 
-    // Check if nama_lembaga already exists (excluding current id)
-    const [duplicateLembaga] = await promisePool.query(
-      'SELECT id FROM lembaga_desa WHERE nama_lembaga = ? AND id != ?',
-      [nama_lembaga, id]
-    );
-
-    if (duplicateLembaga.length > 0) {
-      return res.status(400).json({ error: 'Lembaga dengan nama yang sama sudah ada' });
-    }
-
+    // Update lembaga - hanya update field yang diubah, bukan nama_lembaga
     await promisePool.query(
-      'UPDATE lembaga_desa SET nama_lembaga = ?, deskripsi = ? WHERE id = ?',
-      [nama_lembaga, deskripsi, id]
+      'UPDATE lembaga_desa SET deskripsi = ?, tentang = ?, visi = ?, misi = ? WHERE id = ?',
+      [deskripsi, tentang, visi, misi, id]
     );
 
     const [updatedLembaga] = await promisePool.query(
@@ -183,7 +191,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
 });
 
 // Add pengurus to lembaga (admin only)
-router.post('/:id/pengurus', adminAuth, uploadImage, [
+router.post('/:id/pengurus', adminAuth, uploadFlexible(['foto','photo','image','img','file']), [
   body('nama').notEmpty().withMessage('Nama pengurus wajib diisi'),
   body('jabatan').notEmpty().withMessage('Jabatan wajib diisi')
 ], async (req, res) => {
@@ -228,7 +236,7 @@ router.post('/:id/pengurus', adminAuth, uploadImage, [
 });
 
 // Update pengurus (admin only)
-router.put('/pengurus/:pengurusId', adminAuth, uploadImage, [
+router.put('/pengurus/:pengurusId', adminAuth, uploadFlexible(['foto','photo','image','img','file']), [
   body('nama').notEmpty().withMessage('Nama pengurus wajib diisi'),
   body('jabatan').notEmpty().withMessage('Jabatan wajib diisi')
 ], async (req, res) => {
@@ -296,6 +304,122 @@ router.delete('/pengurus/:pengurusId', adminAuth, async (req, res) => {
     res.json({ message: 'Pengurus berhasil dihapus' });
   } catch (error) {
     console.error('Delete pengurus error:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+});
+
+// Add unit kegiatan to lembaga (admin only)
+router.post('/:id/unit-kegiatan', adminAuth, uploadFlexible(['icon','foto','img','file']), [
+  body('nama').notEmpty().withMessage('Nama unit kegiatan wajib diisi')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { nama } = req.body;
+    const icon = req.file ? `/uploads/${req.file.filename}` : null;
+
+    // Check if lembaga exists
+    const [existingLembaga] = await promisePool.query(
+      'SELECT * FROM lembaga_desa WHERE id = ?',
+      [id]
+    );
+
+    if (existingLembaga.length === 0) {
+      return res.status(404).json({ error: 'Lembaga tidak ditemukan' });
+    }
+
+    const [result] = await promisePool.query(
+      'INSERT INTO unit_kegiatan_lembaga (lembaga_id, nama, icon) VALUES (?, ?, ?)',
+      [id, nama, icon]
+    );
+
+    const [newUnitKegiatan] = await promisePool.query(
+      'SELECT * FROM unit_kegiatan_lembaga WHERE id = ?',
+      [result.insertId]
+    );
+
+    res.status(201).json({
+      message: 'Unit kegiatan berhasil ditambahkan',
+      unit_kegiatan: newUnitKegiatan[0]
+    });
+  } catch (error) {
+    console.error('Add unit kegiatan error:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+});
+
+// Update unit kegiatan (admin only)
+router.put('/unit-kegiatan/:unitId', adminAuth, uploadFlexible(['icon','foto','img','file']), [
+  body('nama').notEmpty().withMessage('Nama unit kegiatan wajib diisi')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { unitId } = req.params;
+    const { nama } = req.body;
+
+    // Check if unit kegiatan exists
+    const [existingUnitKegiatan] = await promisePool.query(
+      'SELECT * FROM unit_kegiatan_lembaga WHERE id = ?',
+      [unitId]
+    );
+
+    if (existingUnitKegiatan.length === 0) {
+      return res.status(404).json({ error: 'Unit kegiatan tidak ditemukan' });
+    }
+
+    let icon = existingUnitKegiatan[0].icon;
+    if (req.file) {
+      icon = `/uploads/${req.file.filename}`;
+    }
+
+    await promisePool.query(
+      'UPDATE unit_kegiatan_lembaga SET nama = ?, icon = ? WHERE id = ?',
+      [nama, icon, unitId]
+    );
+
+    const [updatedUnitKegiatan] = await promisePool.query(
+      'SELECT * FROM unit_kegiatan_lembaga WHERE id = ?',
+      [unitId]
+    );
+
+    res.json({
+      message: 'Unit kegiatan berhasil diupdate',
+      unit_kegiatan: updatedUnitKegiatan[0]
+    });
+  } catch (error) {
+    console.error('Update unit kegiatan error:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+});
+
+// Delete unit kegiatan (admin only)
+router.delete('/unit-kegiatan/:unitId', adminAuth, async (req, res) => {
+  try {
+    const { unitId } = req.params;
+
+    // Check if unit kegiatan exists
+    const [existingUnitKegiatan] = await promisePool.query(
+      'SELECT * FROM unit_kegiatan_lembaga WHERE id = ?',
+      [unitId]
+    );
+
+    if (existingUnitKegiatan.length === 0) {
+      return res.status(404).json({ error: 'Unit kegiatan tidak ditemukan' });
+    }
+
+    await promisePool.query('DELETE FROM unit_kegiatan_lembaga WHERE id = ?', [unitId]);
+
+    res.json({ message: 'Unit kegiatan berhasil dihapus' });
+  } catch (error) {
+    console.error('Delete unit kegiatan error:', error);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
 });
